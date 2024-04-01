@@ -26,7 +26,7 @@ export const signup = async (req, res) => {
       expiresIn: '1d'
     })
 
-    res.status(201).json({ ok: true, user: { username: savedUser.username, name: savedUser.name }, token })
+    res.status(201).json({ ok: true, username: savedUser.username, name: savedUser.name, token })
 
   } catch (error) {
     return res.status(400).json({ ok: false, error: error.message })
@@ -55,7 +55,7 @@ export const login = async (req, res) => {
       expiresIn: '1d'
     })
 
-    res.json({ ok: true, user: { username: user.username, name: user.name }, token })
+    res.json({ ok: true, username: user.username, name: user.name, token })
 
   } catch (error) {
     return res.status(400).json({ ok: false, error: error.message })

@@ -55,6 +55,8 @@ export const postBlog = async (req, res) => {
 
     await ModelUser.findOneAndUpdate({ _id: req.user.id }, { blogs })
 
+    data.id = newBlog._id
+
     return res.status(201).json({ ok: true, data })
 
   } catch (error) {
@@ -90,9 +92,40 @@ export const deleteBlog = async (req, res) => {
       })
     }
 
-    await ModelBlog.findByIdAndDelete({ _id: id })
+    const data = await ModelBlog.findByIdAndDelete({ _id: id })
 
-    return res.status(204)
+    return res.status(204).json({ ok: true, data })
+  } catch (error) {
+    return res.status(400).json({ ok: false, error: error.message })
+  }
+}
+
+
+export const updateLike = async (req, res) => {
+  try {
+    const { id } = req.params
+
+    const { likes } = req.body
+
+    if (!id) {
+      return res.status(401).json({
+        ok: false,
+        error: 'Id blog not provided'
+      })
+    }
+
+    const blogFound = await ModelBlog.findById({ _id: id })
+
+    if (!blogFound) {
+      return res.status(404).json({
+        ok: false,
+        error: 'Blog not found'
+      })
+    }
+
+    const data = await ModelBlog.findByIdAndUpdate({ _id: id }, { likes: likes + 1 }, { new: true })
+
+    return res.status(204).json({ ok: true, data })
   } catch (error) {
     return res.status(400).json({ ok: false, error: error.message })
   }
