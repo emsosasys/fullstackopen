@@ -62,3 +62,38 @@ export const postBlog = async (req, res) => {
     return res.status(400).json({ ok: false, error: error.message })
   }
 }
+
+export const deleteBlog = async (req, res) => {
+  try {
+    const { id } = req.params
+
+    if (!id) {
+      return res.status(401).json({
+        ok: false,
+        error: 'Id blog not provided'
+      })
+    }
+
+    const blogFound = await ModelBlog.findById({ _id: id }).populate('user', { password: 0, blogs: 0 })
+
+    if (!blogFound) {
+      return res.status(404).json({
+        ok: false,
+        error: 'Blog not found'
+      })
+    }
+
+    if (!(blogFound.user.id === req.user.id)) {
+      return res.status(403).json({
+        ok: false,
+        message: 'User unauthorized to delete this blog'
+      })
+    }
+
+    await ModelBlog.findByIdAndDelete({ _id: id })
+
+    return res.status(204)
+  } catch (error) {
+    return res.status(400).json({ ok: false, error: error.message })
+  }
+}
